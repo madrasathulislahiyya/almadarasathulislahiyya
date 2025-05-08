@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Al Madarasathul Islahiyya Result Portal</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --secondary-color: #f8f1e5;
+      --accent-color: #d35400;
+      --text-color: #333;
+      --light-text: #f8f9fa;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                  url('masjid1.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: var(--text-color);
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      z-index: -1;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .subtitle {
+      color: var(--accent-color);
+      font-size: 1rem;
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .search-container {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+    
+    label {
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    input {
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+    }
+    
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background-color: #1e5e22;
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    #resultContainer {
+      width: 100%;
+      max-width: 500px;
+      min-height: 50px; /* Reserve space to prevent layout shift */
+    }
+    
+    .result-card {
+      margin-top: 20px;
+      padding: 25px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+      border-top: 5px solid var(--primary-color);
+    }
+    
+    .student-info {
+      margin-bottom: 20px;
+    }
+    
+    .student-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    
+    .student-class {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .status-container {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    
+    .status-pass { 
+      background-color: rgba(46, 125, 50, 0.1);
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    
+    .status-fail { 
+      background-color: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .status-nopay { 
+      background-color: rgba(255, 193, 7, 0.1);
+      color: #d35400;
+      border-left: 4px solid #d35400;
+    }
+    
+    .status-icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media print {
+      body *:not(.result-card):not(script) {
+        display: none;
+      }
+      .result-card {
+        box-shadow: none;
+        width: 100%;
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 15px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .search-container {
+        padding: 20px;
+      }
+    }
+    
+    footer {
+      margin-top: 30px;
+      color: #666;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-container">
+    <h1>Al Madarasathul Islahiyya 6th Mile</h1>
+    <p class="subtitle">Student Result Portal - Academic Year 2024-2025</p>
+  </div>
+
+  <div class="search-container">
+    <div class="input-group">
+      <label for="studentID"><i class="fas fa-id-card"></i> Student ID</label>
+      <input type="text" id="studentID" placeholder="Enter your Student ID">
+    </div>
+    <button id="viewResultBtn">
+      <i class="fas fa-search"></i> View Result
+    </button>
+  </div>
+
+  <div id="resultContainer">
+    <div class="result-card" id="resultCard">
+      <div class="student-info">
+        <div class="student-name" id="studentName"></div>
+        <div class="student-class" id="studentClass"></div>
+      </div>
+      <div class="status-container" id="studentStatus"></div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Al Madarasathul Islahiyya 6th Mile. All rights reserved.
+  </footer>
+
+  <script>
+    const cono = 'https://docs.google.com/spreadsheets/d/1bs5IFLmjTieyLSu0dseF5RqG30tmzjixEdK0YbjdJ-E/gviz/tq?tqx=out:csv';
+      
+    document.getElementById('viewResultBtn').addEventListener('click', checkResult);
+    document.getElementById('studentID').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkResult();
+      }
+    });
+
+    async function fetchSheetData() {
+        const res = await fetch(cono);
+        const csvText = await res.text();
+    
+        const parsed = Papa.parse(csvText, { header: true });
+        return parsed.data.map(row => {
+        // Trim all values
+        Object.keys(row).forEach(key => {
+            row[key.trim()] = row[key]?.trim();
+        });
+        return row;
+        });
+    }
+    
+    async function checkResult() {
+        // Prevent default form submission behavior
+        event.preventDefault();
+        
+        const inputID = document.getElementById("studentID").value.trim();
+        const resultCard = document.getElementById("resultCard");
+        const nameDiv = document.getElementById("studentName");
+        const classDiv = document.getElementById("studentClass");
+        const statusDiv = document.getElementById("studentStatus");
+    
+        resultCard.style.display = "none";
+    
+        if (!inputID) {
+        alert("Please enter your Student ID.");
+        return;
+        }
+    
+        try {
+          const data = await fetchSheetData();
+          const student = data.find(entry => entry["studentID"] === inputID);
+      
+          if (!student) {
+            nameDiv.textContent = "Student ID not found";
+            classDiv.textContent = "";
+            statusDiv.innerHTML = `<div class="status-container">Please check your ID and try again</div>`;
+            resultCard.style.display = "block";
+            smoothScrollToResult();
+            return;
+          }
+      
+          nameDiv.textContent = student.studentName || "N/A";
+          classDiv.textContent = `Class: ${student.class || "N/A"}`;
+      
+          if (student.FeePaidStatus?.toLowerCase() === "no") {
+            statusDiv.innerHTML = `
+              <div class="status-container status-nopay">
+                <div class="status-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div><strong>Fees not paid</strong></div>
+                <div>Please contact the administration office</div>
+              </div>
+            `;
+          } else {
+            const result = student.resultCard?.toLowerCase();
+            if (result === "pass") {
+              statusDiv.innerHTML = `
+                <div class="status-container status-pass">
+                  <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                  <div><strong>Congratulations!</strong></div>
+                  <div>You have passed the examination</div>
+                </div>
+              `;
+            } else if (result === "fail") {
+              statusDiv.innerHTML = `
+                <div class="status-container status-fail">
+                  <div class="status-icon"><i class="fas fa-times-circle"></i></div>
+                  <div><strong>Result: Fail</strong></div>
+                  <div>Please contact your teacher for guidance</div>
+                </div>
+              `;
+            } else {
+              statusDiv.innerHTML = `
+                <div class="status-container">
+                  <div class="status-icon"><i class="fas fa-info-circle"></i></div>
+                  <div><strong>Result not available</strong></div>
+                  <div>Please check back later or contact admin</div>
+                </div>
+              `;
+            }
+          }
+      
+          resultCard.style.display = "block";
+          smoothScrollToResult();
+        } catch (error) {
+          nameDiv.textContent = "Error";
+          classDiv.textContent = "";
+          statusDiv.innerHTML = `
+            <div class="status-container">
+              <div class="status-icon"><i class="fas fa-exclamation-circle"></i></div>
+              <div>Unable to fetch results at this time</div>
+              <div>Please try again later</div>
+            </div>
+          `;
+          resultCard.style.display = "block";
+          smoothScrollToResult();
+          console.error("Error fetching data:", error);
+        }
+    }
+
+    function smoothScrollToResult() {
+      const resultContainer = document.getElementById('resultContainer');
+      resultContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  </script>
+</body>
+</html>
