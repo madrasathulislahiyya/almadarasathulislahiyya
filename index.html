@@ -312,7 +312,7 @@
     
         try {
           const data = await fetchSheetData();
-          const student = data.find(entry => entry["studentID"] === inputID);
+          const student = data.find(entry => entry["studentID"] === inputID.toLowerCase());
       
           if (!student) {
             nameDiv.textContent = "Student ID not found";
