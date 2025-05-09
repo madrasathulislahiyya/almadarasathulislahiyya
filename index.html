@@ -324,7 +324,7 @@
           }
       
           nameDiv.textContent = student.studentName || "N/A";
-          classDiv.textContent = `Class: ${student.class || "N/A"}`;
+          classDiv.textContent = `Class: ${String(student.class) || "N/A"}`;
       
           if (student.FeePaidStatus?.toLowerCase() === "no") {
             statusDiv.innerHTML = `
